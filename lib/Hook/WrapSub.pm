@@ -6,8 +6,6 @@ use warnings;
 
 use Exporter;
 use Symbol;
-use vars qw( @ISA @EXPORT @EXPORT_OK );
-
 
 our @ISA        = qw/ Exporter /;
 our @EXPORT_OK  = qw/ wrap_subs unwrap_subs /;
