@@ -5,6 +5,7 @@ Revision history for Perl module Hook::WrapSub
     - Moved test.pl to t/01-basic.t
     - Added SEE ALSO section, with links to, and descriptions of,
       similar modules.
+    - Added github repo to pod
     - Reformatted Changes as per CPAN::Changes::Spec
 
 0.03 2000-02-01 JDPORTER

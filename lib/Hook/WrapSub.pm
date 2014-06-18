@@ -323,6 +323,10 @@ the package is called.
 L<Sub::Versive> lets you stack pre- and post-call hooks.
 Last updated in 2001.
 
+=head1 REPOSITORY
+
+L<https://github.com/neilbowers/Hook-WrapSub>
+
 =head1 AUTHOR
 
 jdporter@min.net (John Porter)
