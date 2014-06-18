@@ -1,6 +1,6 @@
 Revision history for Perl module Hook::WrapSub
 
-0.04 2014-06-19
+0.03_01 2014-06-19
     - Switched to Dist::Zilla
     - Moved test.pl to t/01-basic.t
     - Added SEE ALSO section, with links to, and descriptions of,
