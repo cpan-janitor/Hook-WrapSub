@@ -1,19 +1,16 @@
-
 package Hook::WrapSub;
+
+use 5.006;
+use strict;
+use warnings;
 
 use Exporter;
 use Symbol;
-use strict;
-use vars qw( $VERSION @ISA @EXPORT @EXPORT_OK );
+use vars qw( @ISA @EXPORT @EXPORT_OK );
 
 
-$VERSION = '0.03';
-@ISA = qw(Exporter);
-@EXPORT = qw();
-@EXPORT_OK = qw(
-  wrap_subs
-  unwrap_subs
-);
+our @ISA        = qw/ Exporter /;
+our @EXPORT_OK  = qw/ wrap_subs unwrap_subs /;
 
 
 =head1 NAME
@@ -218,7 +215,7 @@ sub wrap_subs(@) {
         @args = caller($up);
       }
       my @vargs = @args; # save temp
-      while ( $args[3] =~ /Hook::WrapSub/ ) {
+      while ( defined($args[3]) && $args[3] =~ /Hook::WrapSub/ ) {
         $up++;
         @args = caller($up);
       }
@@ -256,7 +253,7 @@ sub wrap_subs(@) {
       return( @Hook::WrapSub::result );
     };
 
-    $^W = 0;
+    no warnings 'redefine';
     no strict 'refs';
     *{ $fullname } = $cr;
   }
@@ -280,8 +277,8 @@ sub unwrap_subs(@) {
     local $Hook::WrapSub::UNWRAP = 1;
     my $cr = $sr->();
     if ( defined $cr and $cr =~ /\bCODE\b/ ) {
-      $^W = 0;
       no strict 'refs';
+      no warnings 'redefine';
       *{ $fullname } = $cr;
     }
     else {
