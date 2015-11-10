@@ -84,7 +84,7 @@ due to the magical aliasing nature of @_.)
   Hook::WrapSub::wrap_subs
     sub { splice @_, 0, 1, $handler_object },
     'MyClass::some_method';
-      
+
   my $other_object = new MyClass;
   $other_object->some_method;
 
