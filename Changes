@@ -2,6 +2,8 @@ Revision history for Perl module Hook::WrapSub
 
 0.04 2015-11-10 NEILB
     - Changed github repo URL after changing my github username
+    - Added [MetaJSON] to dist.ini so META.json is included in releases
+    - Tag and push to github when I run "dzil release"
 
 0.04 2014-06-21
     - Non-developer release - changes as per 0.03_01 release
