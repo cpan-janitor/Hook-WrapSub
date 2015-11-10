@@ -329,7 +329,7 @@ Last updated in 2001.
 
 =head1 REPOSITORY
 
-L<https://github.com/neilbowers/Hook-WrapSub>
+L<https://github.com/neilb/Hook-WrapSub>
 
 =head1 AUTHOR
 
