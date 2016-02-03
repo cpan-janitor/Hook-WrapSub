@@ -1,6 +1,10 @@
 Revision history for Perl module Hook::WrapSub
 
-0.04 2015-11-10 NEILB
+0.06 2016-02-03 NEILB
+    - Added links to Class::Method::Modifiers & Moose::Manual::MethodModifiers
+      in SEE ALSO. Thanks to ETHER.
+
+0.05 2015-11-10 NEILB
     - Changed github repo URL after changing my github username
     - Added [MetaJSON] to dist.ini so META.json is included in releases
     - Tag and push to github when I run "dzil release"

@@ -320,6 +320,17 @@ L<Hook::Heckle> provides an OO interface for wrapping pre- and post-call
 hooks around functions or methods in a package. Not updated sinc 2003,
 and has a 20% failed rate on CPAN Testers.
 
+L<Moose::Manual::MethodModifiers> describes L<Moose>'s mechanism
+for hooking a superclass's method.
+The I<before> and I<after> subs are called immediately before or
+after the specified methods are called.
+The I<around> sub wraps the superclass method,
+and can even decide not to invoke the superclass method.
+
+L<Class::Method::Modifiers> provides a L<Moose>-style mechanism
+for a subclass to have I<before>, I<after>, or I<around>
+method modifiers.
+
 L<Class::Wrap> provides the C<wrap()> function, which takes a coderef
 and a package name. The coderef is invoked every time a method in
 the package is called.
