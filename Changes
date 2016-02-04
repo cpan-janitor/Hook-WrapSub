@@ -5,6 +5,7 @@ Revision history for Perl module Hook::WrapSub
       author John Porter in RT#111728
     - Added a better introductory paragraph to the pod, saying what
       the module does.
+    - Moved all the pod to the end of the file.
 
 0.06 2016-02-03 NEILB
     - Added links to Class::Method::Modifiers & Moose::Manual::MethodModifiers

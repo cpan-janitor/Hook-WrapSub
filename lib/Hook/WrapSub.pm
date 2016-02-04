@@ -11,6 +11,116 @@ our @ISA        = qw/ Exporter /;
 our @EXPORT_OK  = qw/ wrap_subs unwrap_subs /;
 
 
+sub wrap_subs(@) {
+  my( $precall_cr, $postcall_cr );
+  ref($_[0]) and $precall_cr = shift;
+  ref($_[-1]) and $postcall_cr = pop;
+  my @names = @_;
+
+  my( $calling_package ) = caller;
+
+  for my $name ( @names ) {
+
+    my $fullname;
+    my $sr = *{ qualify_to_ref($name,$calling_package) }{CODE};
+    if ( defined $sr ) { 
+      $fullname = qualify($name,$calling_package);
+    }
+    else {
+      warn "Can't find subroutine named '$name'\n";
+      next;
+    }
+
+
+    my $cr = sub {
+      $Hook::WrapSub::UNWRAP and return $sr;
+
+      #
+      # this is a bunch of kludg to make a list of values
+      # that look like a "real" caller() result.
+      #
+
+      my $up = 0;
+      my @args = caller($up);
+      while ( $args[0] =~ /Hook::WrapSub/ ) {
+        $up++;
+        @args = caller($up);
+      }
+      my @vargs = @args; # save temp
+      while ( defined($args[3]) && $args[3] =~ /Hook::WrapSub/ ) {
+        $up++;
+        @args = caller($up);
+      }
+      $vargs[3] = $args[3];
+      # now @vargs looks right.
+
+      local $Hook::WrapSub::name = $fullname;
+      local @Hook::WrapSub::result = ();
+      local @Hook::WrapSub::caller = @vargs;
+      my $wantarray = $Hook::WrapSub::caller[5];
+#
+# try to supply the same calling context to the nested sub:
+#
+
+      unless ( defined $wantarray ) {
+        # void context
+        &$precall_cr  if $precall_cr;
+        &$sr;
+        &$postcall_cr if $postcall_cr;
+        return();
+      }
+
+      unless ( $wantarray ) {
+        # scalar context
+        &$precall_cr  if $precall_cr;
+        $Hook::WrapSub::result[0] = &$sr;
+        &$postcall_cr if $postcall_cr;
+        return $Hook::WrapSub::result[0];
+      }
+
+      # list context
+      &$precall_cr  if $precall_cr;
+      @Hook::WrapSub::result = &$sr;
+      &$postcall_cr if $postcall_cr;
+      return( @Hook::WrapSub::result );
+    };
+
+    no warnings 'redefine';
+    no strict 'refs';
+    *{ $fullname } = $cr;
+  }
+}
+
+sub unwrap_subs(@) {
+  my @names = @_;
+
+  my( $calling_package ) = caller;
+
+  for my $name ( @names ) {
+    my $fullname;
+    my $sr = *{ qualify_to_ref($name,$calling_package) }{CODE};
+    if ( defined $sr ) { 
+      $fullname = qualify($name,$calling_package);
+    }
+    else {
+      warn "Can't find subroutine named '$name'\n";
+      next;
+    }
+    local $Hook::WrapSub::UNWRAP = 1;
+    my $cr = $sr->();
+    if ( defined $cr and $cr =~ /\bCODE\b/ ) {
+      no strict 'refs';
+      no warnings 'redefine';
+      *{ $fullname } = $cr;
+    }
+    else {
+      warn "Subroutine '$fullname' not wrapped!";
+    }
+  }
+}
+
+1;
+
 =head1 NAME
 
 Hook::WrapSub - wrap subs with pre- and post-call hooks
@@ -184,116 +294,6 @@ number of times.  A "stack" of the wrappings is
 maintained internally.  wrap_subs "pushes" a wrapping,
 and unwrap_subs "pops".
 
-=cut
-
-sub wrap_subs(@) {
-  my( $precall_cr, $postcall_cr );
-  ref($_[0]) and $precall_cr = shift;
-  ref($_[-1]) and $postcall_cr = pop;
-  my @names = @_;
-
-  my( $calling_package ) = caller;
-
-  for my $name ( @names ) {
-
-    my $fullname;
-    my $sr = *{ qualify_to_ref($name,$calling_package) }{CODE};
-    if ( defined $sr ) { 
-      $fullname = qualify($name,$calling_package);
-    }
-    else {
-      warn "Can't find subroutine named '$name'\n";
-      next;
-    }
-
-
-    my $cr = sub {
-      $Hook::WrapSub::UNWRAP and return $sr;
-
-#
-# this is a bunch of kludg to make a list of values
-# that look like a "real" caller() result.
-#
-      my $up = 0;
-      my @args = caller($up);
-      while ( $args[0] =~ /Hook::WrapSub/ ) {
-        $up++;
-        @args = caller($up);
-      }
-      my @vargs = @args; # save temp
-      while ( defined($args[3]) && $args[3] =~ /Hook::WrapSub/ ) {
-        $up++;
-        @args = caller($up);
-      }
-      $vargs[3] = $args[3];
-      # now @vargs looks right.
-
-      local $Hook::WrapSub::name = $fullname;
-      local @Hook::WrapSub::result = ();
-      local @Hook::WrapSub::caller = @vargs;
-      my $wantarray = $Hook::WrapSub::caller[5];
-#
-# try to supply the same calling context to the nested sub:
-#
-
-      unless ( defined $wantarray ) {
-        # void context
-        &$precall_cr  if $precall_cr;
-        &$sr;
-        &$postcall_cr if $postcall_cr;
-        return();
-      }
-
-      unless ( $wantarray ) {
-        # scalar context
-        &$precall_cr  if $precall_cr;
-        $Hook::WrapSub::result[0] = &$sr;
-        &$postcall_cr if $postcall_cr;
-        return $Hook::WrapSub::result[0];
-      }
-
-      # list context
-      &$precall_cr  if $precall_cr;
-      @Hook::WrapSub::result = &$sr;
-      &$postcall_cr if $postcall_cr;
-      return( @Hook::WrapSub::result );
-    };
-
-    no warnings 'redefine';
-    no strict 'refs';
-    *{ $fullname } = $cr;
-  }
-}
-
-sub unwrap_subs(@) {
-  my @names = @_;
-
-  my( $calling_package ) = caller;
-
-  for my $name ( @names ) {
-    my $fullname;
-    my $sr = *{ qualify_to_ref($name,$calling_package) }{CODE};
-    if ( defined $sr ) { 
-      $fullname = qualify($name,$calling_package);
-    }
-    else {
-      warn "Can't find subroutine named '$name'\n";
-      next;
-    }
-    local $Hook::WrapSub::UNWRAP = 1;
-    my $cr = $sr->();
-    if ( defined $cr and $cr =~ /\bCODE\b/ ) {
-      no strict 'refs';
-      no warnings 'redefine';
-      *{ $fullname } = $cr;
-    }
-    else {
-      warn "Subroutine '$fullname' not wrapped!";
-    }
-  }
-}
-
-1;
 
 =head1 SEE ALSO
 
