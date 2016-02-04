@@ -344,7 +344,9 @@ L<https://github.com/neilb/Hook-WrapSub>
 
 =head1 AUTHOR
 
-jdporter@min.net (John Porter)
+This module was written by John Porter E<lt>jdporter@min.netE<gt>
+
+It is now being maintained by Neil Bowers.
 
 =head1 COPYRIGHT
 
