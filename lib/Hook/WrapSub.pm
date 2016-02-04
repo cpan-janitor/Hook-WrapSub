@@ -26,6 +26,10 @@ Hook::WrapSub - wrap subs with pre- and post-call hooks
 
 =head1 DESCRIPTION
 
+This module lets you wrap a function,
+providing one or both of functions that are called just before and just after,
+whenever the wrapped function is called.
+
 There are a number of other modules that provide the same functionality
 as this module, some of them better. Have a look at the list in SEE ALSO,
 below, before you decide which to use.
